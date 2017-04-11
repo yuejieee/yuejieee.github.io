@@ -1,0 +1,22 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=Edge"><meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"><meta name="format-detection" content="telephone=no"><meta name="format-detection" content="email=no"><meta name="description"><meta name="keywords" content="iOS, Objective-C, Swift"><title>SDWebImage实现原理的简单分析 - yuejieee's Blog</title><link rel="stylesheet" href="/css/main_style.min.css"><link rel="icon" href="image/icon.png"></head><body><input id="navi" type="checkbox"><ul class="main-navication"><li><a href="/"><span>Home</span></a></li><li><a href="https://github.com"><span>Github</span></a></li><li><a href="http://www.cocoachina.com/"><span>CocoaChina</span></a></li><li><a href="http://cn.engadget.com/"><span>Engadget</span></a></li></ul><div class="wrapper" id="wrap"><div class="post-header"><label class="navi-button light" for="navi">MENU</label><img class="background" src="http://callfiles.ueibo.com/hexo-theme-laughing/post_background.jpg"><div class="post-title"><h1 class="title">SDWebImage实现原理的简单分析</h1><ul class="meta"><li><i class="icon icon-author"></i>yuejieee</li><li><i class="icon icon-clock"></i>1 Minutes</li><li><i class="icon icon-calendar"></i>April 11, 2017</li></ul></div></div><div class="article-content" style="max-width:800px"><h3 id="以UIImageView-WebCache为例"><a href="#以UIImageView-WebCache为例" class="headerlink" title="以UIImageView+WebCache为例"></a>以UIImageView+WebCache为例</h3><p>调用sd_setImageWithURL方法，该方法实现中是调用另一个内部方法sd_setImageWithURL…<br>之后查看缓存，使用<strong>SDWebImageCache</strong>来完成整个缓存查询的过程。</p>
+<h3 id="SDWebImageCache"><a href="#SDWebImageCache" class="headerlink" title="SDWebImageCache"></a>SDWebImageCache</h3><p>首先调用imageFromMemoryCacheForKey方法进行查询，其中<strong>Key是Image的URL</strong>，内存存储原理是利用系统的NSCache类来存储到内存中。如果内中不存在，则进入磁盘存储进行查询，调用diskImageForKey来进行查询，磁盘中的图片以<strong>URL经过MD5（16位）处理后的字符串</strong>为文件名存储。磁盘中存在图片则将其备份到内存中，不存在则进行下载处理，下载过程由<strong>SDWebImageDownloader</strong>进行处理.</p>
+<h3 id="SDWebImageDownloader"><a href="#SDWebImageDownloader" class="headerlink" title="SDWebImageDownloader"></a>SDWebImageDownloader</h3><p>类中调用downloadImageWithURL方法进行下载，方法执行过程中调用addProgressCallback方法来存储下载过程和下载结果进行回调。下载完成后在主线程设置image属性，完成图像的异步下载和设置。</p>
+<hr>
+<h3 id="基本流程"><a href="#基本流程" class="headerlink" title="基本流程"></a>基本流程</h3><ol>
+<li>查看缓存</li>
+<li>缓存命中<ul>
+<li>返回图片</li>
+<li>更新UIImageView</li>
+</ul>
+</li>
+<li>缓存未命中<ul>
+<li>异步下载</li>
+<li>备份进缓存</li>
+<li>更新UIImageView</li>
+</ul>
+</li>
+</ol>
+</div><div class="article-meta" style="max-width:800px"></div><ul class="navication"><li class="home"><a href="/"><i class="icon icon-home"></i></a></li><li><a href="/2017/04/11/关于GCD多线程的一些东西/"><i class="icon icon-arror-left"></i></a></li></ul><div class="page-footer"><div class="top"><ul class="social"><li><a href="https://github.com/yuejieee" title="Github" target="_blank"><i class="icon icon-github"></i></a></li><li><a href="http://weibo.com/u/3645434183" title="Weibo" target="_blank"><i class="icon icon-weibo"></i></a></li></ul></div><div class="bottom"><p class="copyright">© 2017 yuejieee's Blog<br><small>POWER BY <a href="https://hexo.io" target="_blank">HEXO</a></small><small>, THEME BY <a href="https://github.com/BoizZ/hexo-theme-laughing" target="_blank">LAUGHING</a></small></p></div></div></div><script>var wrap = document.getElementById('wrap');
+window.onload = function () {
+  wrap.className += ' done';
+}</script></body></html>
